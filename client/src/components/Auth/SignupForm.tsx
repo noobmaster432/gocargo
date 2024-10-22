@@ -55,7 +55,7 @@ const SignupForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post("/auth/signup", formData);
+      await api.post("/auth/register", formData);
       toast({
         title: "Signup Successful",
         description: "Your account has been created. Please log in.",

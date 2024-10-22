@@ -9,13 +9,29 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// api.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
+
 export const login = async (email: string, password: string): Promise<User> => {
   const response = await api.post("/auth/login", { email, password });
+  localStorage.setItem("userId", response.data.user.id);
+  localStorage.setItem("token", response.data.token);
   return response.data.user;
 };
 
 export const logout = async (): Promise<void> => {
-  await api.post("/auth/logout");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("token");
 };
 
 export const getCurrentUser = async (): Promise<User | null> => {

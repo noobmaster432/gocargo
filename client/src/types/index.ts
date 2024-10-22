@@ -13,14 +13,14 @@ export interface Vehicle {
 }
 
 export interface Booking {
-  id: string;
+  _id: string;
   userId: string;
   driverId: string | null;
-  pickup: string;
-  dropoff: string;
+  pickupLocation: string;
+  dropoffLocation: string;
   status: "pending" | "accepted" | "in_progress" | "completed" | "cancelled";
-  date: string;
-  estimatedPrice: number;
+  createdAt: string;
+  price: number;
 }
 
 export interface Job extends Booking {

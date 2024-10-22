@@ -1,17 +1,31 @@
 const Booking = require("../models/Booking");
+const User = require("../models/User");
 
 exports.createBooking = async (req, res) => {
   try {
-    const { pickupLocation, dropoffLocation, vehicleType, userId, price } = req.body;
+    const { pickupLocation, dropoffLocation, vehicleType, price } = req.body;
+
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const booking = await Booking.create({
-      user: userId,
+      user: userId, 
       pickupLocation,
       dropoffLocation,
       vehicleType,
-      status: "pending",
-      price
+      status: "pending", 
+      price, 
     });
-    res.status(201).json(booking);
+
+    res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      booking,
+    });
   } catch (error) {
     res
       .status(500)
@@ -66,5 +80,34 @@ exports.getUserBookings = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching user bookings", error: error.message });
+  }
+};
+
+exports.cancelBooking = async (req, res) => {
+  try {
+    const bookingId = req.params.bookingId;
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    if (booking.status === "cancelled") {
+      return res.status(400).json({ message: "Booking is already cancelled" });
+    }
+
+    booking.status = "cancelled";
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error cancelling booking",
+      error: error.message,
+    });
   }
 };

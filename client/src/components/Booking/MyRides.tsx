@@ -22,7 +22,14 @@ const MyRides: React.FC = () => {
 
   const fetchRides = async () => {
     try {
-      const response = await api.get("/bookings/my-rides");
+      const response = await api.get(
+        `/bookings/user/${localStorage.getItem("userId")}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       setRides(response.data);
     } catch (error) {
       toast({
@@ -35,7 +42,11 @@ const MyRides: React.FC = () => {
 
   const cancelRide = async (bookingId: string) => {
     try {
-      await api.post(`/bookings/${bookingId}/cancel`);
+      await api.put(`/bookings/${bookingId}/cancel`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+    });
       toast({
         title: "Ride Cancelled",
         description: "Your ride has been successfully cancelled.",
@@ -54,25 +65,25 @@ const MyRides: React.FC = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">My Rides</h1>
       {rides.map((ride) => (
-        <Card key={ride.id}>
+        <Card key={ride._id}>
           <CardHeader>
-            <CardTitle>Ride to {ride.dropoff}</CardTitle>
-            <CardDescription>Booking ID: {ride.id}</CardDescription>
+            <CardTitle>Ride to {ride.dropoffLocation}</CardTitle>
+            <CardDescription>Booking ID: {ride._id}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
               <div>
                 <p>
-                  <strong>From:</strong> {ride.pickup}
+                  <strong>From:</strong> {ride.pickupLocation}
                 </p>
                 <p>
-                  <strong>To:</strong> {ride.dropoff}
+                  <strong>To:</strong> {ride.dropoffLocation}
                 </p>
                 <p>
-                  <strong>Date:</strong> {new Date(ride.date).toLocaleString()}
+                  <strong>Date & Time:</strong> {new Date(ride.createdAt).toLocaleString()}
                 </p>
                 <p>
-                  <strong>Price:</strong> ${ride.estimatedPrice.toFixed(2)}
+                  <strong>Price:</strong> ${ride?.price?.toFixed(2)}
                 </p>
               </div>
               <div>
@@ -89,7 +100,7 @@ const MyRides: React.FC = () => {
               <Button
                 variant="destructive"
                 className="mt-4"
-                onClick={() => cancelRide(ride.id)}
+                onClick={() => cancelRide(ride._id)}
               >
                 Cancel Ride
               </Button>

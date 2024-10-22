@@ -4,7 +4,14 @@ const bcrypt = require("bcryptjs");
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const {
+      name,
+      email,
+      password,
+      role,
+      driverInfo: { type, licensePlate, capacity } = {},
+    } = req.body;
+
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
@@ -15,6 +22,7 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      driverInfo: { type, licensePlate, capacity },
     });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
@@ -28,6 +36,7 @@ exports.register = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          driverInfo: user.driverInfo
         },
       });
   } catch (error) {

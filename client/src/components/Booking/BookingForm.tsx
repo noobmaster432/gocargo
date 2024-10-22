@@ -59,12 +59,20 @@ const BookingForm: React.FC = () => {
       return;
     }
     try {
-      const response = await api.post("/bookings", {
-        pickupLocation: pickup,
-        dropoffLocation: dropoff,
-        vehicleType,
-        price: estimatedPrice,
-      });
+      const response = await api.post(
+        "/bookings",
+        {
+          pickupLocation: pickup,
+          dropoffLocation: dropoff,
+          vehicleType,
+          price: estimatedPrice,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       toast({
         title: "Booking Successful",
         description: `Your booking ID is ${response.data.bookingId}`,
