@@ -12,6 +12,7 @@ import TrackingComponent from "./components/Tracking/TrackingComponent";
 import LocationUpdate from "./components/Driver/LocationUpdate";
 import VehicleManagement from "./components/Driver/VehicleManagement";
 import { useAuth } from "./hooks/useAuth";
+import SignupForm from "./components/Auth/SignupForm";
 
 const App: React.FC = () => {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignupForm />} />
         {user && (
           <>
             <Route path="/profile" element={<UserProfile />} />

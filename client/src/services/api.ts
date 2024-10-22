@@ -18,14 +18,15 @@ export const logout = async (): Promise<void> => {
   await api.post("/auth/logout");
 };
 
-// export const getCurrentUser = async (): Promise<User | null> => {
-//   try {
-//     const response = await api.get("/auth/me");
-//     return response.data.user;
-//   } catch (error) {
-//     return null;
-//   }
-// };
+export const getCurrentUser = async (): Promise<User | null> => {
+  try {
+    const response = await api.get("/auth/me");
+    return response.data.user;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return null;
+  }
+};
 
 export const fetchAdminDashboardData = async (dateRange: DateRange | undefined) => {
   const response = await api.get("/admin/dashboard", {

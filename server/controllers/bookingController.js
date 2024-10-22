@@ -2,13 +2,14 @@ const Booking = require("../models/Booking");
 
 exports.createBooking = async (req, res) => {
   try {
-    const { pickupLocation, dropoffLocation, vehicleType, userId } = req.body;
+    const { pickupLocation, dropoffLocation, vehicleType, userId, price } = req.body;
     const booking = await Booking.create({
       user: userId,
       pickupLocation,
       dropoffLocation,
       vehicleType,
       status: "pending",
+      price
     });
     res.status(201).json(booking);
   } catch (error) {

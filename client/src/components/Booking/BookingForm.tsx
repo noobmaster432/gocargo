@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -19,28 +18,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import api from "../../services/api";
 
 const BookingForm: React.FC = () => {
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [vehicleType, setVehicleType] = useState("");
+  const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
   const navigate = useNavigate();
+
+  // Simulated price calculation based on vehicle type and a random distance
+  const calculateEstimatedPrice = (vehicleType: string) => {
+    const basePrice =
+      {
+        standard: 10,
+        premium: 15,
+        suv: 20,
+      }[vehicleType] || 10;
+
+    const distance = Math.floor(Math.random() * 100) + 1;
+    return basePrice * distance;
+  };
+
+  useEffect(() => {
+    if (vehicleType) {
+      const price = calculateEstimatedPrice(vehicleType);
+      setEstimatedPrice(price);
+    }
+  }, [vehicleType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!estimatedPrice) {
+      toast({
+        title: "Error",
+        description: "Please select a vehicle type to get an estimated price.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       const response = await api.post("/bookings", {
-        pickup,
-        dropoff,
+        pickupLocation: pickup,
+        dropoffLocation: dropoff,
         vehicleType,
+        price: estimatedPrice,
       });
       toast({
         title: "Booking Successful",
         description: `Your booking ID is ${response.data.bookingId}`,
       });
       navigate("/rides");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Booking Failed",
@@ -93,6 +123,14 @@ const BookingForm: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+            {estimatedPrice !== null && (
+              <div className="flex flex-col space-y-1.5">
+                <Label>Estimated Price</Label>
+                <div className="text-2xl font-bold">
+                  ${estimatedPrice.toFixed(2)}
+                </div>
+              </div>
+            )}
           </div>
         </form>
       </CardContent>

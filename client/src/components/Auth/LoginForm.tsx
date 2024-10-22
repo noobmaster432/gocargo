@@ -33,8 +33,8 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-[350px]">
+    <div className="flex items-center justify-center bg-gray-100">
+      <Card className="w-[400px] mt-6">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>
