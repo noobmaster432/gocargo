@@ -1,4 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,89 +18,98 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
+import api from "../../services/api";
+import { Vehicle } from "../../types";
 
-interface Vehicle {
-  id: string;
-  type: string;
-  licensePlate: string;
-  capacity: string;
-}
-
-export const VehicleManagement: React.FC = () => {
+const VehicleManagement: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [newVehicle, setNewVehicle] = useState<Omit<Vehicle, "id">>({
+  const [newVehicle, setNewVehicle] = useState({
     type: "",
     licensePlate: "",
     capacity: "",
   });
 
   useEffect(() => {
-    // TODO: Fetch actual vehicle data from API
-    const mockVehicles: Vehicle[] = [
-      {
-        id: "1",
-        type: "Car",
-        licensePlate: "ABC123",
-        capacity: "4 passengers",
-      },
-      { id: "2", type: "Van", licensePlate: "XYZ789", capacity: "1000 kg" },
-    ];
-    setVehicles(mockVehicles);
+    fetchVehicles();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewVehicle((prev) => ({ ...prev, [name]: value }));
+  const fetchVehicles = async () => {
+    try {
+      const response = await api.get("/driver/vehicles");
+      setVehicles(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch vehicles. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleTypeChange = (value: string) => {
-    setNewVehicle((prev) => ({ ...prev, type: value }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post("/driver/vehicles", newVehicle);
+      toast({
+        title: "Vehicle Added",
+        description: "Your new vehicle has been successfully added.",
+      });
+      fetchVehicles();
+      setNewVehicle({ type: "", licensePlate: "", capacity: "" });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add vehicle. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAddVehicle = () => {
-    // TODO: Implement add vehicle logic and API call
-    const vehicleWithId = { ...newVehicle, id: Date.now().toString() };
-    setVehicles([...vehicles, vehicleWithId]);
-    setNewVehicle({ type: "", licensePlate: "", capacity: "" });
+  const removeVehicle = async (vehicleId: string) => {
+    try {
+      await api.delete(`/driver/vehicles/${vehicleId}`);
+      toast({
+        title: "Vehicle Removed",
+        description: "The vehicle has been successfully removed.",
+      });
+      fetchVehicles();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove vehicle. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="mb-8">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Vehicle Management</h1>
+      <Card>
         <CardHeader>
           <CardTitle>Add New Vehicle</CardTitle>
           <CardDescription>
-            Register a new vehicle for your fleet
+            Enter the details of your new vehicle
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="type">Vehicle Type</Label>
-              <Select onValueChange={handleTypeChange} value={newVehicle.type}>
-                <SelectTrigger>
+              <Select
+                value={newVehicle.type}
+                onValueChange={(value) =>
+                  setNewVehicle({ ...newVehicle, type: value })
+                }
+              >
+                <SelectTrigger id="type">
                   <SelectValue placeholder="Select vehicle type" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Car">Car</SelectItem>
-                  <SelectItem value="Van">Van</SelectItem>
-                  <SelectItem value="Truck">Truck</SelectItem>
+                <SelectContent position="popper">
+                  <SelectItem value="sedan">Sedan</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                  <SelectItem value="van">Van</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -99,60 +117,55 @@ export const VehicleManagement: React.FC = () => {
               <Label htmlFor="licensePlate">License Plate</Label>
               <Input
                 id="licensePlate"
-                name="licensePlate"
                 value={newVehicle.licensePlate}
-                onChange={handleInputChange}
-                placeholder="Enter license plate"
+                onChange={(e) =>
+                  setNewVehicle({ ...newVehicle, licensePlate: e.target.value })
+                }
+                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="capacity">Capacity</Label>
               <Input
                 id="capacity"
-                name="capacity"
+                type="number"
                 value={newVehicle.capacity}
-                onChange={handleInputChange}
-                placeholder="Enter capacity (e.g., 4 passengers or 1000 kg)"
+                onChange={(e) =>
+                  setNewVehicle({ ...newVehicle, capacity: e.target.value })
+                }
+                required
               />
             </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={handleAddVehicle}>Add Vehicle</Button>
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Vehicles</CardTitle>
-          <CardDescription>Manage your registered vehicles</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>License Plate</TableHead>
-                <TableHead>Capacity</TableHead>
-                <TableHead>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell>{vehicle.type}</TableCell>
-                  <TableCell>{vehicle.licensePlate}</TableCell>
-                  <TableCell>{vehicle.capacity}</TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm">
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            <Button type="submit">Add Vehicle</Button>
+          </form>
         </CardContent>
       </Card>
+      <h2 className="text-2xl font-semibold mt-6">Your Vehicles</h2>
+      {vehicles.map((vehicle) => (
+        <Card key={vehicle.id}>
+          <CardHeader>
+            <CardTitle>{vehicle.type}</CardTitle>
+            <CardDescription>
+              License Plate: {vehicle.licensePlate}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>
+              <strong>Capacity:</strong> {vehicle.capacity}
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button
+              variant="destructive"
+              onClick={() => removeVehicle(vehicle.id)}
+            >
+              Remove Vehicle
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };
+
+export default VehicleManagement;

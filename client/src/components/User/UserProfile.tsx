@@ -1,66 +1,99 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { toast } from "@/hooks/use-toast";
+import { useAuth } from '../../hooks/useAuth'
+import api from '../../services/api'
 
-interface UserData {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-export const UserProfile: React.FC = () => {
-  const [userData, setUserData] = useState<UserData>({
-    name: "",
-    email: "",
-    phone: "",
-  });
+const UserProfile: React.FC = () => {
+  const { user, login } = useAuth()
+  const [profile, setProfile] = useState({
+    name: '',
+    email: ''
+  })
+  const [password, setPassword] = useState({
+    current: '',
+    new: '',
+    confirm: '',
+  })
 
   useEffect(() => {
-    // TODO: Fetch actual user data from API
-    const mockUserData: UserData = {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: "123-456-7890",
-    };
-    setUserData(mockUserData);
-  }, []);
+    if (user) {
+      setProfile({
+        name: user.name,
+        email: user.email
+      })
+    }
+  }, [user])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const response = await api.put('/user/profile', profile)
+      if(response.status === 200) {
+        login(profile.email, password.current)
+      }
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement update profile logic and API call
-    console.log("Profile update submitted:", userData);
-  };
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password.new !== password.confirm) {
+      toast({
+        title: "Error",
+        description: "New passwords do not match.",
+        variant: "destructive",
+      })
+      return
+    }
+    try {
+      await api.put('/user/change-password', {
+        currentPassword: password.current,
+        newPassword: password.new,
+      })
+      toast({
+        title: "Password Changed",
+        description: "Your password has been successfully changed.",
+      })
+      setPassword({ current: '', new: '', confirm: '' })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to change password. Please check your current password and try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">User Profile</h1>
+      <Card>
         <CardHeader>
-          <CardTitle>User Profile</CardTitle>
-          <CardDescription>Manage your account information</CardDescription>
+          <CardTitle>Personal Information</CardTitle>
+          <CardDescription>Update your personal details</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleProfileUpdate} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                name="name"
-                value={userData.name}
-                onChange={handleInputChange}
+                value={profile.name}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                 required
               />
             </div>
@@ -68,32 +101,59 @@ export const UserProfile: React.FC = () => {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                value={userData.email}
-                onChange={handleInputChange}
+                value={profile.email}
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                required
+              />
+            </div>
+            <Button type="submit">Update Profile</Button>
+          </form>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Change Password</CardTitle>
+          <CardDescription>Update your account password</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Current Password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={password.current}
+                onChange={(e) => setPassword({ ...password, current: e.target.value })}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="newPassword">New Password</Label>
               <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={userData.phone}
-                onChange={handleInputChange}
+                id="newPassword"
+                type="password"
+                value={password.new}
+                onChange={(e) => setPassword({ ...password, new: e.target.value })}
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={password.confirm}
+                onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
+                required
+              />
+            </div>
+            <Button type="submit">Change Password</Button>
           </form>
         </CardContent>
-        <CardFooter>
-          <Button type="submit" onClick={handleSubmit}>
-            Update Profile
-          </Button>
-        </CardFooter>
       </Card>
     </div>
-  );
-};
+  )
+}
+
+export default UserProfile

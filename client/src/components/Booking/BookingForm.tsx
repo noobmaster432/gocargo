@@ -1,4 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,87 +19,90 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
+import api from "../../services/api";
 
-export const BookingForm: React.FC = () => {
+const BookingForm: React.FC = () => {
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [vehicleType, setVehicleType] = useState("");
-  const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement booking logic and API call
-    console.log("Booking submitted:", { pickup, dropoff, vehicleType });
-    // Simulate price estimation
-    setEstimatedPrice(Math.floor(Math.random() * 100) + 50);
+    try {
+      const response = await api.post("/bookings", {
+        pickup,
+        dropoff,
+        vehicleType,
+      });
+      toast({
+        title: "Booking Successful",
+        description: `Your booking ID is ${response.data.bookingId}`,
+      });
+      navigate("/rides");
+    } catch (error) {
+      toast({
+        title: "Booking Failed",
+        description:
+          "There was an error processing your booking. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Book a Ride</CardTitle>
-          <CardDescription>Enter the details for your shipment</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+    <Card className="w-[350px] mx-auto">
+      <CardHeader>
+        <CardTitle>Book a Ride</CardTitle>
+        <CardDescription>Enter your ride details below.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit}>
+          <div className="grid w-full items-center gap-4">
+            <div className="flex flex-col space-y-1.5">
               <Label htmlFor="pickup">Pickup Location</Label>
               <Input
                 id="pickup"
+                placeholder="Enter pickup location"
                 value={pickup}
                 onChange={(e) => setPickup(e.target.value)}
-                placeholder="Enter pickup address"
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col space-y-1.5">
               <Label htmlFor="dropoff">Dropoff Location</Label>
               <Input
                 id="dropoff"
+                placeholder="Enter dropoff location"
                 value={dropoff}
                 onChange={(e) => setDropoff(e.target.value)}
-                placeholder="Enter dropoff address"
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col space-y-1.5">
               <Label htmlFor="vehicleType">Vehicle Type</Label>
               <Select onValueChange={setVehicleType} required>
-                <SelectTrigger>
+                <SelectTrigger id="vehicleType">
                   <SelectValue placeholder="Select vehicle type" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="car">Car</SelectItem>
-                  <SelectItem value="van">Van</SelectItem>
-                  <SelectItem value="truck">Truck</SelectItem>
+                <SelectContent position="popper">
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button type="submit" onClick={handleSubmit}>
-            Get Estimate
-          </Button>
-          {estimatedPrice && (
-            <div>
-              <p className="text-lg font-semibold">
-                Estimated Price: ${estimatedPrice}
-              </p>
-              <Button className="ml-4">Confirm Booking</Button>
-            </div>
-          )}
-        </CardFooter>
-      </Card>
-    </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter>
+        <Button className="w-full" type="submit" onClick={handleSubmit}>
+          Book Now
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
+
+export default BookingForm;

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -11,11 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export const LoginForm: React.FC = () => {
+const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -24,9 +27,8 @@ export const LoginForm: React.FC = () => {
     try {
       await login(email, password);
       navigate("/");
-    } catch (error) {
-      console.error("Login failed:", error);
-      // Handle login error (e.g., show error message to user)
+    } catch (err) {
+      setError("Invalid email or password");
     }
   };
 
@@ -67,13 +69,20 @@ export const LoginForm: React.FC = () => {
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Register</Button>
-          <Button type="submit" onClick={handleSubmit}>
+        <CardFooter className="flex flex-col">
+          <Button className="w-full" type="submit" onClick={handleSubmit}>
             Login
           </Button>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </CardFooter>
       </Card>
     </div>
   );
 };
+
+export default LoginForm;
