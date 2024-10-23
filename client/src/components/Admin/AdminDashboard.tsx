@@ -37,7 +37,7 @@ const AdminDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
+    from: new Date(2024, 9, 1),
     to: addDays(new Date(), 20),
   });
 
@@ -176,14 +176,12 @@ const AdminDashboard: React.FC = () => {
               {
                 header: "Created At",
                 accessorKey: "createdAt",
-                cell: ({ row }) =>
-                  format(new Date(row.original?.createdAt), "PPpp"),
-              },
-              {
-                header: "Last Updated",
-                accessorKey: "updatedAt",
-                cell: ({ row }) =>
-                  format(new Date(row.original?.updatedAt), "PPpp"),
+                cell: ({ row }) => {
+                  const createdAt = new Date(row.createdAt);
+                  return isNaN(createdAt.getTime())
+                    ? "Invalid Date"
+                    : format(createdAt, "PPpp");
+                },
               },
             ]}
           />
@@ -208,8 +206,12 @@ const AdminDashboard: React.FC = () => {
               {
                 header: "Created At",
                 accessorKey: "createdAt",
-                cell: ({ row }) =>
-                  format(new Date(row.original?.createdAt), "PPpp"),
+                cell: ({ row }) => {
+                  const createdAt = new Date(row.createdAt);
+                  return isNaN(createdAt.getTime())
+                    ? "Invalid Date"
+                    : format(createdAt, "PPpp");
+                },
               },
             ]}
           />
@@ -224,31 +226,32 @@ const AdminDashboard: React.FC = () => {
               {
                 header: "User",
                 accessorKey: "user.name",
-                cell: ({ row }) =>
-                  row.original.user?.name || row.original.user?.email,
+                cell: ({ row }) => row.user?.name || row.user?.email,
               },
               {
                 header: "Driver",
                 accessorKey: "driver.name",
                 cell: ({ row }) =>
-                  row.original.driver
-                    ? row.original.driver.name || row.original.driver.email
-                    : "Not Assigned",
+                  row.driver ? row.driver.name || row.driver.email : "N/A",
               },
               { header: "Status", accessorKey: "status" },
               {
                 header: "Price",
                 accessorKey: "price",
-                cell: ({ row }) => `$${row.original.price.toFixed(2)}`,
-              },
-              {
-                header: "Created At",
-                accessorKey: "createdAt",
-                cell: ({ row }) =>
-                  format(new Date(row.original?.createdAt), "PPpp"),
+                cell: ({ row }) => `$${row.price.toFixed(2)}`,
               },
               { header: "Pickup", accessorKey: "pickupLocation" },
               { header: "Dropoff", accessorKey: "dropoffLocation" },
+              {
+                header: "Created At",
+                accessorKey: "createdAt",
+                cell: ({ row }) => {
+                  const createdAt = new Date(row.createdAt);
+                  return isNaN(createdAt.getTime())
+                    ? "Invalid Date"
+                    : format(createdAt, "PPpp");
+                },
+              },
             ]}
           />
         </TabsContent>

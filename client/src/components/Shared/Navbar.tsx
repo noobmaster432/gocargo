@@ -63,6 +63,14 @@ const Navbar: React.FC = () => {
                   Admin Dashboard
                 </Link>
               )}
+              {user && (
+                <Link
+                  to="/tracking"
+                  className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium"
+                >
+                  Tracking
+                </Link>
+              )}
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">

@@ -72,7 +72,9 @@ const DataTable: React.FC<DataTableProps> = ({
           <TableRow key={rowIndex}>
             {columns.map((column) => (
               <TableCell key={column.accessorKey}>
-                {getNestedValue(row, column.accessorKey)}
+                {column.cell
+                  ? column.cell({ row }) 
+                  : getNestedValue(row, column.accessorKey)}
               </TableCell>
             ))}
           </TableRow>
