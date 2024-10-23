@@ -74,9 +74,10 @@ const BookingForm: React.FC = () => {
           },
         }
       );
+      console.log(response.data);
       toast({
         title: "Booking Successful",
-        description: `Your booking ID is ${response.data.bookingId}`,
+        description: `Your booking ID is ${response.data.booking._id}`,
       });
       navigate("/rides");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -146,7 +147,7 @@ const BookingForm: React.FC = () => {
               <div className="flex flex-col space-y-1.5">
                 <Label>Estimated Price</Label>
                 <div className="text-2xl font-bold">
-                  ${estimatedPrice.toFixed(2)}
+                  ₹{estimatedPrice.toFixed(2)}
                 </div>
               </div>
             )}

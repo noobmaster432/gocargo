@@ -96,6 +96,7 @@ const DriverDashboard: React.FC = () => {
         description: "You have successfully accepted the job.",
       });
       fetchJobs();
+      fetchMyJobs();
     } catch (error) {
       toast({
         title: "Error",
