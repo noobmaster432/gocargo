@@ -6,7 +6,7 @@ export interface User {
 }
 
 export interface Vehicle {
-  id: string;
+  _id: string;
   type: string;
   licensePlate: string;
   capacity: string;

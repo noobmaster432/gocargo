@@ -76,7 +76,11 @@ const VehicleManagement: React.FC = () => {
 
   const removeVehicle = async (vehicleId: string) => {
     try {
-      await api.delete(`/driver/vehicles/${vehicleId}`);
+      await api.delete(`/vehicles/${vehicleId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       toast({
         title: "Vehicle Removed",
         description: "The vehicle has been successfully removed.",
@@ -150,9 +154,9 @@ const VehicleManagement: React.FC = () => {
       </Card>
       <h2 className="text-2xl font-semibold mt-6">Your Vehicles</h2>
       {vehicles.map((vehicle) => (
-        <Card key={vehicle.id}>
+        <Card key={vehicle._id}>
           <CardHeader>
-            <CardTitle>{vehicle.type}</CardTitle>
+            <CardTitle className="uppercase">{vehicle.type}</CardTitle>
             <CardDescription>
               License Plate: {vehicle.licensePlate}
             </CardDescription>
@@ -165,7 +169,7 @@ const VehicleManagement: React.FC = () => {
           <CardFooter>
             <Button
               variant="destructive"
-              onClick={() => removeVehicle(vehicle.id)}
+              onClick={() => removeVehicle(vehicle._id)}
             >
               Remove Vehicle
             </Button>
