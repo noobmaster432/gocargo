@@ -50,8 +50,7 @@ const AdminDashboard: React.FC = () => {
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
-        setTimeout(() => setIsLoading(false), 5000);
-        // setIsLoading(false);
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -110,10 +109,10 @@ const AdminDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {isLoading ? (
               <>
-                <Skeleton className="bg-white h-28 w-80" />
-                <Skeleton className="bg-white h-28 w-80" />
-                <Skeleton className="bg-white h-28 w-80" />
-                <Skeleton className="bg-white h-28 w-80" />
+                <Skeleton className="bg-white h-28 w-[17rem]" />
+                <Skeleton className="bg-white h-28 w-[17rem]" />
+                <Skeleton className="bg-white h-28 w-[17rem]" />
+                <Skeleton className="bg-white h-28 w-[17rem]" />
               </>
             ) : (
               <>
