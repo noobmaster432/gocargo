@@ -15,6 +15,20 @@ const userSchema = new mongoose.Schema(
       latitude: { type: Number },
       longitude: { type: Number },
     },
+    driverInfo: {
+      type: {
+        type: String, 
+        required: false, 
+      },
+      licensePlate: {
+        type: String, 
+        required: false,
+      },
+      capacity: {
+        type: Number, 
+        required: false,
+      },
+    },
   },
   { timestamps: true }
 );
