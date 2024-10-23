@@ -60,13 +60,9 @@ const DriverDashboard: React.FC = () => {
       const response = await api.get("/driver/status");
       setIsAvailable(response.data.isAvailable);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch driver status. Please try again.",
-        variant: "destructive",
-      });
+      console.log(error);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     fetchJobs();
@@ -76,7 +72,6 @@ const DriverDashboard: React.FC = () => {
 
   const toggleAvailability = async () => {
     try {
-      // const response = await api.post("/driver/toggle-availability");
       setIsAvailable(!isAvailable);
       toast({
         title: "Status Updated",
@@ -85,11 +80,7 @@ const DriverDashboard: React.FC = () => {
         } for new jobs.`,
       });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update availability. Please try again.",
-        variant: "destructive",
-      });
+      console.log(error);
     }
   };
 

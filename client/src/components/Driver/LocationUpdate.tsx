@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -25,13 +24,9 @@ const LocationUpdate: React.FC = () => {
       const response = await api.get("/driver/current-booking");
       setCurrentBooking(response.data);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch current booking. Please try again.",
-        variant: "destructive",
-      });
+      console.log(error);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     fetchCurrentBooking();
@@ -46,11 +41,7 @@ const LocationUpdate: React.FC = () => {
         description: "Your location has been successfully updated.",
       });
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update location. Please try again.",
-        variant: "destructive",
-      });
+      console.log(error);
     }
   };
 
