@@ -136,13 +136,13 @@ The system is designed to handle 10,000 requests per second, with a registered b
      - A single **User** (acting as a **driver**) can be assigned to multiple bookings.
 
 2. **User-to-Vehicle**:
-   - There is a **1-to-1** relationship between the **User** (with the **role** of a driver) and **Vehicle** entities:
-     - Each **driver** owns or is assigned to exactly one **Vehicle**.
+   - There is a **N-to-1** relationship between the **User** (with the **role** of a driver) and **Vehicle** entities:
+     - Each **driver** owns or is assigned to one or more **Vehicle**.
 
 ### Summary of Relationships:
 - **User (customer)** to **Booking**: One user can create many bookings.
 - **User (driver)** to **Booking**: One driver can handle many bookings.
-- **User (driver)** to **Vehicle**: One driver owns or is assigned exactly one vehicle.
+- **User (driver)** to **Vehicle**: One driver owns or is assigned one or more vehicles.
 
 ## Setup and Installation
 
