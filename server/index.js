@@ -10,6 +10,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const driverRoutes = require("./routes/driverRoutes");
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const trackingRoutes = require("./routes/trackingRoutes");
 
 const app = express();
 
@@ -19,7 +20,7 @@ connectDB();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", 
+    origin: process.env.FRONTEND_URI, 
     credentials: true, 
   })
 );
@@ -32,6 +33,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/tracking", trackingRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

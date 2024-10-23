@@ -28,9 +28,19 @@ export interface Job extends Booking {
 }
 
 export interface TrackingData {
-  id: string;
-  bookingId: string;
-  status: string;
-  currentLocation: string;
-  estimatedDelivery: string;
+  _id: string;
+  user: string;
+  pickupLocation: string;
+  dropoffLocation: string;
+  vehicleType: string;
+  status: string; 
+  price: number;
+  createdAt: string;
+  updatedAt: string;
+  currentLocation: {
+    type: string;
+    coordinates: [number, number];
+  };
+  driver: string;
 }
+

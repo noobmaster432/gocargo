@@ -48,6 +48,27 @@ export const getCurrentUser = async (): Promise<User | null> => {
   }
 };
 
+export const getTrackingInfo = async (bookingId: string) => {
+  const response = await api.get(`/tracking/${bookingId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.data;
+};
+
+export const updateTracking = async (
+  bookingId: string,
+  data: { status: string; latitude: number; longitude: number }
+) => {
+  const response = await api.put(`/tracking/${bookingId}`, data, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return response.data;
+};
+
 export const fetchAdminDashboardData = async (dateRange: DateRange | undefined) => {
   const response = await api.get("/admin/dashboard", {
     params: {
@@ -57,7 +78,5 @@ export const fetchAdminDashboardData = async (dateRange: DateRange | undefined) 
   });
   return response.data;
 };
-
-// Add more API functions as needed
 
 export default api;

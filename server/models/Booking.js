@@ -13,6 +13,17 @@ const bookingSchema = new mongoose.Schema(
       default: "pending",
     },
     price: { type: Number },
+    currentLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
   },
   { timestamps: true }
 );
