@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '../../hooks/useAuth'
 import api from '../../services/api'
 
 const UserProfile: React.FC = () => {
+  const { toast } = useToast();
   const { user, login } = useAuth()
   const [profile, setProfile] = useState({
     name: '',

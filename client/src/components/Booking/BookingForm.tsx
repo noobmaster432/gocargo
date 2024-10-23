@@ -18,10 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import api from "../../services/api";
 
 const BookingForm: React.FC = () => {
+  const { toast } = useToast();
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [vehicleType, setVehicleType] = useState("");

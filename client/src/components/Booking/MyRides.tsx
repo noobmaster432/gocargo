@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -9,18 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import api from "../../services/api";
 import { Booking } from "../../types";
 
 const MyRides: React.FC = () => {
+  const { toast } = useToast();
   const [rides, setRides] = useState<Booking[]>([]);
 
-  useEffect(() => {
-    fetchRides();
-  }, []);
-
-  const fetchRides = async () => {
+  const fetchRides = useCallback(async () => {
     try {
       const response = await api.get(
         `/bookings/user/${localStorage.getItem("userId")}`,
@@ -38,7 +35,11 @@ const MyRides: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchRides();
+  }, [fetchRides]);
 
   const cancelRide = async (bookingId: string) => {
     try {

@@ -19,10 +19,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import api from "../../services/api";
 
 const SignupForm: React.FC = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",

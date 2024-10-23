@@ -10,11 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import api from "../../services/api";
 import { TrackingData } from "../../types";
 
 const TrackingComponent: React.FC = () => {
+  const { toast } = useToast();
   const [bookingId, setBookingId] = useState("");
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
 
@@ -32,7 +33,7 @@ const TrackingComponent: React.FC = () => {
           variant: "destructive",
         });
       }
-    }, [bookingId]);
+    }, [bookingId, toast]);
 
   useEffect(() => {
     if (trackingData) {

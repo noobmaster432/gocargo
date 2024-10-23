@@ -11,19 +11,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import api from "../../services/api";
 
 const LocationUpdate: React.FC = () => {
+  const { toast } = useToast();
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [currentBooking, setCurrentBooking] = useState<any>(null);
 
-  useEffect(() => {
-    fetchCurrentBooking();
-  }, []);
-
-  const fetchCurrentBooking = async () => {
+  const fetchCurrentBooking = React.useCallback(async () => {
     try {
       const response = await api.get("/driver/current-booking");
       setCurrentBooking(response.data);
@@ -34,7 +31,11 @@ const LocationUpdate: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchCurrentBooking();
+  }, [fetchCurrentBooking]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

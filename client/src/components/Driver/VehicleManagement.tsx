@@ -18,11 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import api from "../../services/api";
 import { Vehicle } from "../../types";
 
 const VehicleManagement: React.FC = () => {
+  const { toast } = useToast();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [newVehicle, setNewVehicle] = useState({
     type: "",
@@ -30,11 +31,7 @@ const VehicleManagement: React.FC = () => {
     capacity: "",
   });
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
-
-  const fetchVehicles = async () => {
+  const fetchVehicles = React.useCallback(async () => {
     try {
       const response = await api.get("/vehicles", {
         headers: {
@@ -49,7 +46,11 @@ const VehicleManagement: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

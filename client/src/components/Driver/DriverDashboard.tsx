@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -10,23 +10,18 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import api from "../../services/api";
 import { Job } from "../../types";
 import { Badge } from "../ui/badge";
 
 const DriverDashboard: React.FC = () => {
+  const { toast } = useToast();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [isAvailable, setIsAvailable] = useState(false);
 
-  useEffect(() => {
-    fetchJobs();
-    fetchMyJobs();
-    fetchDriverStatus();
-  }, []);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const response = await api.get("/drivers/bookings/available", {
         headers: {
@@ -41,9 +36,9 @@ const DriverDashboard: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const fetchMyJobs = async () => {
+  const fetchMyJobs = useCallback(async () => {
     try {
       const response = await api.get("/drivers/bookings", {
         headers: {
@@ -58,9 +53,9 @@ const DriverDashboard: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
-  const fetchDriverStatus = async () => {
+  const fetchDriverStatus = useCallback(async () => {
     try {
       const response = await api.get("/driver/status");
       setIsAvailable(response.data.isAvailable);
@@ -71,7 +66,13 @@ const DriverDashboard: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchJobs();
+    fetchMyJobs();
+    fetchDriverStatus();
+  }, [fetchJobs, fetchMyJobs, fetchDriverStatus]);
 
   const toggleAvailability = async () => {
     try {
