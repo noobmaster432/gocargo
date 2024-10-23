@@ -40,6 +40,8 @@ Go Cargo is an implementation of a highly scalable logistics platform that allow
 
 The system is designed to handle 10,000 requests per second, with a registered base of 100,000 drivers and 50 million users globally. It uses a microservices architecture to ensure scalability and maintainability.
 
+![image](https://github.com/user-attachments/assets/795e1a92-0be2-4de8-96ac-32663ad6ccc1)
+
 
 ### **Entities and Attributes:**
 
