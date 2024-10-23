@@ -7,7 +7,7 @@ router.use(protect, authorize("driver"));
 
 router.put("/location", driverController.updateLocation);
 router.get("/bookings/available", driverController.getAvailableBookings);
-router.put("/bookings/:id/accept", driverController.acceptBooking);
+router.put("/bookings/:id", driverController.acceptBooking);
 router.get("/bookings", driverController.getDriverBookings);
 
 module.exports = router;

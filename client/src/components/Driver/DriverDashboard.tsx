@@ -13,20 +13,44 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import api from "../../services/api";
 import { Job } from "../../types";
+import { Badge } from "../ui/badge";
 
 const DriverDashboard: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
     fetchJobs();
+    fetchMyJobs();
     fetchDriverStatus();
   }, []);
 
   const fetchJobs = async () => {
     try {
-      const response = await api.get("/driver/jobs");
+      const response = await api.get("/drivers/bookings/available", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setJobs(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch jobs. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchMyJobs = async () => {
+    try {
+      const response = await api.get("/drivers/bookings", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setMyJobs(response.data);
     } catch (error) {
       toast({
         title: "Error",
@@ -51,12 +75,12 @@ const DriverDashboard: React.FC = () => {
 
   const toggleAvailability = async () => {
     try {
-      const response = await api.post("/driver/toggle-availability");
-      setIsAvailable(response.data.isAvailable);
+      // const response = await api.post("/driver/toggle-availability");
+      setIsAvailable(!isAvailable);
       toast({
         title: "Status Updated",
         description: `You are now ${
-          response.data.isAvailable ? "available" : "unavailable"
+          isAvailable ? "available" : "unavailable"
         } for new jobs.`,
       });
     } catch (error) {
@@ -70,7 +94,11 @@ const DriverDashboard: React.FC = () => {
 
   const acceptJob = async (jobId: string) => {
     try {
-      await api.post(`/driver/jobs/${jobId}/accept`);
+      await api.put(`/drivers/bookings/${jobId}`, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       toast({
         title: "Job Accepted",
         description: "You have successfully accepted the job.",
@@ -105,28 +133,58 @@ const DriverDashboard: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      <h2 className="text-2xl font-semibold mt-6">Available Jobs</h2>
-      {jobs.map((job) => (
-        <Card key={job.id}>
+      <h2 className="text-2xl font-semibold mt-6">My Jobs</h2>
+      {myJobs.map((job) => (
+        <Card key={job._id}>
           <CardHeader>
-            <CardTitle>Job to {job.dropoff}</CardTitle>
-            <CardDescription>Booking ID: {job.id}</CardDescription>
+            <CardTitle>Job to {job.dropoffLocation}</CardTitle>
+            <CardDescription>Booking ID: {job._id}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
               <div>
                 <p>
-                  <strong>From:</strong> {job.pickup}
+                  <strong>From:</strong> {job.pickupLocation}
                 </p>
                 <p>
-                  <strong>To:</strong> {job.dropoff}
+                  <strong>To:</strong> {job.dropoffLocation}
                 </p>
                 <p>
-                  <strong>Estimated Earnings:</strong> $
-                  {job.estimatedEarnings.toFixed(2)}
+                  <strong>Estimated Earnings:</strong> ${job.price.toFixed(2)}
                 </p>
               </div>
-              <Button onClick={() => acceptJob(job.id)}>Accept Job</Button>
+              <Badge
+                  className="capitalize"
+                  variant={
+                    job.status === "completed" ? "default" : "secondary"
+                  }
+                >{job.status}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      <h2 className="text-2xl font-semibold mt-6">Available Jobs</h2>
+      {jobs.map((job) => (
+        <Card key={job._id}>
+          <CardHeader>
+            <CardTitle>Job to {job.dropoffLocation}</CardTitle>
+            <CardDescription>Booking ID: {job._id}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div>
+                <p>
+                  <strong>From:</strong> {job.pickupLocation}
+                </p>
+                <p>
+                  <strong>To:</strong> {job.dropoffLocation}
+                </p>
+                <p>
+                  <strong>Estimated Earnings:</strong> ${job.price.toFixed(2)}
+                </p>
+              </div>
+              <Button onClick={() => acceptJob(job._id)}>Accept Job</Button>
             </div>
           </CardContent>
         </Card>

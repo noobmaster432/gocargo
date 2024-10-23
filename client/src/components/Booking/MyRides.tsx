@@ -42,7 +42,7 @@ const MyRides: React.FC = () => {
 
   const cancelRide = async (bookingId: string) => {
     try {
-      await api.put(`/bookings/${bookingId}/cancel`, {
+      await api.put(`/bookings/${bookingId}/cancel`,{}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
