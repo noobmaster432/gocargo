@@ -14,8 +14,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginForm: React.FC = () => {
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +28,10 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     try {
       await login(email, password);
+      toast({
+        title: "Login Successful",
+        description: "Your have successfully logged in to your account.",
+      });
       navigate("/");
     } catch (err) {
       setError("Invalid email or password");
