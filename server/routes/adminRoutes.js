@@ -5,9 +5,8 @@ const { protect, authorize } = require("../middlewares/authMiddleware");
 
 router.use(protect, authorize("admin"));
 
-router.get("/users", adminController.getAllUsers);
-router.get("/bookings", adminController.getAllBookings);
-router.get("/stats/users", adminController.getUserStats);
-router.get("/stats/bookings", adminController.getBookingStats);
+router.get("/dashboard", adminController.getDashboardData);
+router.get("/user-stats", adminController.getUserStats);
+router.get("/booking-stats", adminController.getBookingStats);
 
 module.exports = router;

@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { fetchAdminDashboardData } from "../../services/api";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DatePickerWithRange from "@/components/ui/date-picker-with-range";
 import DashboardCard from "../Shared/DashboardCard";
@@ -23,8 +18,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { Skeleton } from "@/components/ui/skeleton";
 
 ChartJS.register(
   CategoryScale,
@@ -39,31 +35,40 @@ ChartJS.register(
 
 const AdminDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<any>(null);
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+  const [isLoading, setIsLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2022, 0, 20),
     to: addDays(new Date(), 20),
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchAdminDashboardData(dateRange);
-      setDashboardData(data);
+      setIsLoading(true);
+      try {
+        const data = await fetchAdminDashboardData(dateRange);
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setTimeout(() => setIsLoading(false), 5000);
+        // setIsLoading(false);
+      }
     };
     fetchData();
   }, [dateRange]);
 
-  if (!dashboardData) return <div>Loading...</div>;
-
   const revenueChartData = {
-    labels: dashboardData.revenueAnalytics.map((data: any) =>
-      new Date(data._id).toLocaleDateString()
-    ),
+    labels:
+      dashboardData?.revenueAnalytics.map((data: any) =>
+        new Date(data._id).toLocaleDateString()
+      ) || [],
     datasets: [
       {
         label: "Daily Revenue",
-        data: dashboardData.revenueAnalytics.map(
-          (data: any) => data.totalRevenue
-        ),
+        data:
+          dashboardData?.revenueAnalytics.map(
+            (data: any) => data.totalRevenue
+          ) || [],
         borderColor: "rgb(75, 192, 192)",
         tension: 0.1,
       },
@@ -75,12 +80,12 @@ const AdminDashboard: React.FC = () => {
     datasets: [
       {
         data: [
-          dashboardData.bookings.filter((b: any) => b.status === "pending")
-            .length,
-          dashboardData.bookings.filter((b: any) => b.status === "completed")
-            .length,
-          dashboardData.bookings.filter((b: any) => b.status === "cancelled")
-            .length,
+          dashboardData?.bookings.filter((b: any) => b.status === "pending")
+            .length || 0,
+          dashboardData?.bookings.filter((b: any) => b.status === "completed")
+            .length || 0,
+          dashboardData?.bookings.filter((b: any) => b.status === "cancelled")
+            .length || 0,
         ],
         backgroundColor: ["#FFCE56", "#36A2EB", "#FF6384"],
       },
@@ -88,7 +93,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mx-6">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
       <DatePickerWithRange date={dateRange} setDate={setDateRange} />
@@ -103,22 +108,33 @@ const AdminDashboard: React.FC = () => {
 
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <DashboardCard
-              title="Total Users"
-              value={dashboardData.userCount}
-            />
-            <DashboardCard
-              title="Total Drivers"
-              value={dashboardData.driverCount}
-            />
-            <DashboardCard
-              title="Total Bookings"
-              value={dashboardData.bookingCount}
-            />
-            <DashboardCard
-              title="Total Revenue"
-              value={`$${dashboardData.totalRevenue.toFixed(2)}`}
-            />
+            {isLoading ? (
+              <>
+                <Skeleton className="bg-white h-28 w-80" />
+                <Skeleton className="bg-white h-28 w-80" />
+                <Skeleton className="bg-white h-28 w-80" />
+                <Skeleton className="bg-white h-28 w-80" />
+              </>
+            ) : (
+              <>
+                <DashboardCard
+                  title="Total Users"
+                  value={dashboardData?.userCount}
+                />
+                <DashboardCard
+                  title="Total Drivers"
+                  value={dashboardData?.driverCount}
+                />
+                <DashboardCard
+                  title="Total Bookings"
+                  value={dashboardData?.bookingCount}
+                />
+                <DashboardCard
+                  title="Total Revenue"
+                  value={`${dashboardData?.totalRevenue.toFixed(2)}`}
+                />
+              </>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -127,7 +143,11 @@ const AdminDashboard: React.FC = () => {
                 <CardTitle>Revenue Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <Line data={revenueChartData} />
+                {isLoading ? (
+                  <Skeleton className="h-[300px] w-full" />
+                ) : (
+                  <Line data={revenueChartData} />
+                )}
               </CardContent>
             </Card>
             <Card>
@@ -135,7 +155,11 @@ const AdminDashboard: React.FC = () => {
                 <CardTitle>Booking Status Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <Bar data={bookingStatusData} />
+                {isLoading ? (
+                  <Skeleton className="h-[300px] w-full" />
+                ) : (
+                  <Bar data={bookingStatusData} />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -143,39 +167,88 @@ const AdminDashboard: React.FC = () => {
 
         <TabsContent value="users">
           <DataTable
-            data={dashboardData.users}
+            data={dashboardData?.users}
+            isLoading={isLoading}
             columns={[
-              { header: "Username", accessorKey: "username" },
+              { header: "Username", accessorKey: "name" },
               { header: "Email", accessorKey: "email" },
               { header: "Role", accessorKey: "role" },
-              { header: "Created At", accessorKey: "createdAt" },
+              {
+                header: "Created At",
+                accessorKey: "createdAt",
+                cell: ({ row }) =>
+                  format(new Date(row.original?.createdAt), "PPpp"),
+              },
+              {
+                header: "Last Updated",
+                accessorKey: "updatedAt",
+                cell: ({ row }) =>
+                  format(new Date(row.original?.updatedAt), "PPpp"),
+              },
             ]}
           />
         </TabsContent>
 
         <TabsContent value="drivers">
           <DataTable
-            data={dashboardData.drivers}
+            data={dashboardData?.drivers}
+            isLoading={isLoading}
             columns={[
-              { header: "Username", accessorKey: "username" },
+              { header: "Username", accessorKey: "name" },
               { header: "Email", accessorKey: "email" },
-              { header: "License Number", accessorKey: "licenseNumber" },
-              { header: "Experience (Years)", accessorKey: "experienceYears" },
-              { header: "Available", accessorKey: "isAvailable" },
+              { header: "Vehicle Type", accessorKey: "driverInfo.type" },
+              {
+                header: "License Plate",
+                accessorKey: "driverInfo.licensePlate",
+              },
+              {
+                header: "Vehicle Capacity",
+                accessorKey: "driverInfo.capacity",
+              },
+              {
+                header: "Created At",
+                accessorKey: "createdAt",
+                cell: ({ row }) =>
+                  format(new Date(row.original?.createdAt), "PPpp"),
+              },
             ]}
           />
         </TabsContent>
 
         <TabsContent value="bookings">
           <DataTable
-            data={dashboardData.bookings}
+            data={dashboardData?.bookings}
+            isLoading={isLoading}
             columns={[
-              { header: "ID", accessorKey: "_id" },
-              { header: "User", accessorKey: "user.username" },
-              { header: "Driver", accessorKey: "driver.username" },
+              { header: "Booking ID", accessorKey: "_id" },
+              {
+                header: "User",
+                accessorKey: "user.name",
+                cell: ({ row }) =>
+                  row.original.user?.name || row.original.user?.email,
+              },
+              {
+                header: "Driver",
+                accessorKey: "driver.name",
+                cell: ({ row }) =>
+                  row.original.driver
+                    ? row.original.driver.name || row.original.driver.email
+                    : "Not Assigned",
+              },
               { header: "Status", accessorKey: "status" },
-              { header: "Price", accessorKey: "price" },
-              { header: "Created At", accessorKey: "createdAt" },
+              {
+                header: "Price",
+                accessorKey: "price",
+                cell: ({ row }) => `$${row.original.price.toFixed(2)}`,
+              },
+              {
+                header: "Created At",
+                accessorKey: "createdAt",
+                cell: ({ row }) =>
+                  format(new Date(row.original?.createdAt), "PPpp"),
+              },
+              { header: "Pickup", accessorKey: "pickupLocation" },
+              { header: "Dropoff", accessorKey: "dropoffLocation" },
             ]}
           />
         </TabsContent>

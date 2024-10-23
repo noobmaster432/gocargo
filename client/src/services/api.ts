@@ -70,12 +70,18 @@ export const updateTracking = async (
 };
 
 export const fetchAdminDashboardData = async (dateRange: DateRange | undefined) => {
-  const response = await api.get("/admin/dashboard", {
-    params: {
-      startDate: dateRange?.from?.toISOString(),
-      endDate: dateRange?.to?.toISOString(),
-    },
-  });
+  const response = await api.get(
+    "/admin/dashboard",
+    {
+      params: {
+        startDate: dateRange?.from?.toISOString(),
+        endDate: dateRange?.to?.toISOString(),
+      },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
   return response.data;
 };
 

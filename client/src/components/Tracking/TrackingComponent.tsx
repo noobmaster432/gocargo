@@ -253,7 +253,9 @@ const TrackingComponent: React.FC = () => {
                 <strong>Current Location:</strong>{" "}
                 {trackingData.currentLocation?.coordinates &&
                 trackingData.currentLocation.coordinates.length > 0
-                  ? trackingData.currentLocation.coordinates.join(", ")
+                  ? trackingData.status === "completed"
+                    ? trackingData.dropoffLocation
+                    : trackingData.currentLocation.coordinates.join(", ")
                   : trackingData.pickupLocation}
               </p>
               <p>
