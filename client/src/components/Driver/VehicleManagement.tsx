@@ -36,7 +36,11 @@ const VehicleManagement: React.FC = () => {
 
   const fetchVehicles = async () => {
     try {
-      const response = await api.get("/driver/vehicles");
+      const response = await api.get("/vehicles", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       setVehicles(response.data);
     } catch (error) {
       toast({
@@ -50,7 +54,11 @@ const VehicleManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post("/driver/vehicles", newVehicle);
+      await api.post("/vehicles", newVehicle, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       toast({
         title: "Vehicle Added",
         description: "Your new vehicle has been successfully added.",
