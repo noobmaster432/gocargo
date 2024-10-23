@@ -108,9 +108,14 @@ const Navbar: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/login">
-                <Button>Login</Button>
-              </Link>
+              <div className="space-x-4">
+                <Link to="/login">
+                  <Button>Login</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="outline">Sign Up</Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
