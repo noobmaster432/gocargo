@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -26,11 +26,12 @@ const BookingForm: React.FC = () => {
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [vehicleType, setVehicleType] = useState("");
+  const [distance, setDistance] = useState<number>(0);
   const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
   const navigate = useNavigate();
 
   // Simulated price calculation based on vehicle type and a random distance
-  const calculateEstimatedPrice = (vehicleType: string) => {
+  const calculateEstimatedPrice = useCallback((vehicleType: string) => {
     const basePrice =
       {
         standard: 10,
@@ -38,16 +39,15 @@ const BookingForm: React.FC = () => {
         suv: 20,
       }[vehicleType] || 10;
 
-    const distance = Math.floor(Math.random() * 100) + 1;
     return basePrice * distance;
-  };
+  },[distance]);
 
   useEffect(() => {
     if (vehicleType) {
       const price = calculateEstimatedPrice(vehicleType);
       setEstimatedPrice(price);
     }
-  }, [vehicleType]);
+  }, [vehicleType, calculateEstimatedPrice]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,6 +116,16 @@ const BookingForm: React.FC = () => {
                 placeholder="Enter dropoff location"
                 value={dropoff}
                 onChange={(e) => setDropoff(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="distance">Distance</Label>
+              <Input
+                id="distance"
+                placeholder="Enter distance"
+                value={distance}
+                onChange={(e) => setDistance(Number(e.target.value))}
                 required
               />
             </div>
