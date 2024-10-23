@@ -10,7 +10,7 @@ import api from '../../services/api'
 
 const UserProfile: React.FC = () => {
   const { toast } = useToast();
-  const { user, login } = useAuth()
+  const { user } = useAuth()
   const [profile, setProfile] = useState({
     name: '',
     email: ''
@@ -33,10 +33,11 @@ const UserProfile: React.FC = () => {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await api.put('/user/profile', profile)
-      if(response.status === 200) {
-        login(profile.email, password.current)
-      }
+      await api.put("/users/profile", profile, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
@@ -61,9 +62,13 @@ const UserProfile: React.FC = () => {
       return
     }
     try {
-      await api.put('/user/change-password', {
+      await api.put('/users/change-password', {
         currentPassword: password.current,
         newPassword: password.new,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
       toast({
         title: "Password Changed",

@@ -7,5 +7,6 @@ router.use(protect);
 
 router.get("/profile", userController.getUserProfile);
 router.put("/profile", userController.updateUserProfile);
+router.put("/change-password", userController.changePassword);
 
 module.exports = router;

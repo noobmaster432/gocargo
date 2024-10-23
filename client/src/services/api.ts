@@ -36,7 +36,11 @@ export const logout = async (): Promise<void> => {
 
 export const getCurrentUser = async (): Promise<User | null> => {
   try {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/users/profile", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
     return response.data.user;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
